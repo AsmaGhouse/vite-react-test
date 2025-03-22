@@ -7,10 +7,24 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Development
 node_modules
 dist
 dist-ssr
 *.local
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Testing
+coverage
+__snapshots__
+*.snap
+
+# Production
+build
 
 # Editor directories and files
 .vscode/*
@@ -22,3 +36,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Misc
+.cache
+.temp
+*.bak

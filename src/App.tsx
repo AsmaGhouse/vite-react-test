@@ -1,35 +1,47 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { BrowserRouter } from "react-router-dom";
+import { Suspense } from "react";
+import { AppRoutes } from "./core/routes/AppRoutes";
+import LoadingFallback from "./components/loader/LoadingFallback";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Provider } from "react-redux";
+import { ThemeProvider } from "./providers/ThemeProvider";
+import { PersistGate } from 'redux-persist/integration/react';
+import { persistor, store } from "./store";
+import ErrorBoundary from "./components/error-boundary/ErrorBoundary";
+import { MUIProviders } from './providers/MUIProviders';
+import { Toaster } from "./components/ui/sonner";
 
-function App() {
-  const [count, setCount] = useState(0)
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
+
+const App = () => {
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <MUIProviders>
+      <ThemeProvider>
+        <Provider store={store}>
+          <PersistGate loading={<LoadingFallback />} persistor={persistor}>
+            <QueryClientProvider client={queryClient}>
+              <BrowserRouter>
+                <Toaster />
+                <ErrorBoundary>
+                  <Suspense fallback={<LoadingFallback />}>
+                    <AppRoutes />
+                  </Suspense>
+                </ErrorBoundary>
+              </BrowserRouter>
+            </QueryClientProvider>
+          </PersistGate>
+        </Provider>
+      </ThemeProvider>
+    </MUIProviders>
+  );
+};
 
-export default App
+export default App;
